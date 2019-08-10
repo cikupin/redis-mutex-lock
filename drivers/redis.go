@@ -74,6 +74,14 @@ func (r *RedisPool) GetPool() *redis.Pool {
 	return r.pool
 }
 
+// GetConn will get redis connection
+func (r *RedisPool) GetConn() redis.Conn {
+	if r.pool == nil {
+		log.Fatalln(errors.New("error get redis pool"))
+	}
+	return r.pool.Get()
+}
+
 // GetPoolLocker gets redis mutex locker
 func (r *RedisPool) GetPoolLocker() *redsync.Redsync {
 	var arrPool []redsync.Pool
