@@ -73,5 +73,15 @@ func (r *RequestHandler) SetData(wr http.ResponseWriter, req *http.Request) {
 // GetDataWithThunderingHerdUpdate will get data from database
 // If data is not exist, it will save to cache with thundering herd
 func (r *RequestHandler) GetDataWithThunderingHerdUpdate(wr http.ResponseWriter, req *http.Request) {
+	log.Println("get-data-with-thundering-herd was requested...")
 
+	data, err := r.cacheRepo.GetCacheWithThunderingHerd(constants.UserCacheKey)
+	if err != nil {
+		panic(err)
+	}
+
+	resp := api.GeneralSuccess
+	resp.Message = data
+	resp.WriteJSON(wr)
+	return
 }

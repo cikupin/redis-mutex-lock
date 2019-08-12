@@ -48,6 +48,7 @@ func makeHandler() (http.Handler, error) {
 	r.Handlers["ok"] = requestHandler.OK
 	r.Handlers["get-data"] = requestHandler.GetData
 	r.Handlers["set-data"] = requestHandler.SetData
+	r.Handlers["update-with-thundering-herd"] = requestHandler.GetDataWithThunderingHerdUpdate
 
 	return r.GetHandler()
 }

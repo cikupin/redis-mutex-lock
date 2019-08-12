@@ -2,10 +2,13 @@ package repositories
 
 import (
 	"encoding/json"
+	"log"
+	"time"
 
 	"github.com/cikupin/redis-mutex-lock/drivers"
 	"github.com/cikupin/redis-mutex-lock/internal/constants"
 	"github.com/cikupin/redis-mutex-lock/internal/models"
+	"github.com/go-redsync/redsync"
 	"github.com/gomodule/redigo/redis"
 )
 
@@ -13,6 +16,8 @@ import (
 type ICache interface {
 	GetCache(key string) (models.User, error)
 	UpdateCache(key string) error
+	GetLocker(lockerKey string) *redsync.Mutex
+	GetCacheWithThunderingHerd(key string) (models.User, error)
 }
 
 // CacheRepo defines cache repost=sitory struct
@@ -66,4 +71,46 @@ func (c *CacheRepo) UpdateCache(key string) error {
 		return err
 	}
 	return nil
+}
+
+// GetCacheWithThunderingHerd will get data from cache
+// If data not exist, update with thundering herd
+func (c *CacheRepo) GetCacheWithThunderingHerd(key string) (models.User, error) {
+	var (
+		user models.User
+		conn redis.Conn
+	)
+
+	conn = c.redisDriver.GetConn()
+	defer conn.Close()
+
+	userCache, err := redis.String(conn.Do("GET", key))
+	if err != nil && err != redis.ErrNil {
+		return user, err
+	}
+
+	if err == redis.ErrNil {
+		mtx := c.redisDriver.GetPoolLocker().NewMutex(
+			key,
+			redsync.SetTries(constants.RedisLockerTries),
+			redsync.SetExpiry(constants.RedisLockerExpiry),
+		)
+		mtx.Lock()
+		log.Println("<<<<<<<<<< [ THUNDERING HERD ] LOCKING >>>>>>>>>>>>")
+
+		log.Println("<<<<<<<<<< [ THUNDERING HERD ] UPDATING DATA >>>>>>>>>>>>")
+		time.Sleep(15 * time.Second)
+		_ = c.UpdateCache(key)
+
+		mtx.Unlock()
+		log.Println("<<<<<<<<<< [ THUNDERING HERD ] UNLOCKING >>>>>>>>>>>>")
+
+		userCache, _ = redis.String(conn.Do("GET", key))
+	}
+
+	err = json.Unmarshal([]byte(userCache), &user)
+	if err != nil {
+		return user, err
+	}
+	return user, nil
 }
