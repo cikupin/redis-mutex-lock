@@ -6,8 +6,8 @@ import (
 	"sync"
 
 	"github.com/cikupin/redis-mutex-lock/drivers"
-
 	"github.com/cikupin/redis-mutex-lock/internal/handlers"
+	"github.com/cikupin/redis-mutex-lock/internal/repositories"
 )
 
 // RestAPI is a type of struct that contain rest API handler
@@ -41,11 +41,13 @@ func initializeDrivers() {
 }
 
 func makeHandler() (http.Handler, error) {
-	// initialize handler
-	requestHandler := handlers.NewRequestHandler()
+	cacheRepo := repositories.NewCacheRepo(redisDriver)
+	requestHandler := handlers.NewRequestHandler(cacheRepo)
 
 	r := NewRestAPIRouter(make(map[string]http.HandlerFunc))
 	r.Handlers["ok"] = requestHandler.OK
+	r.Handlers["get-data"] = requestHandler.GetData
+	r.Handlers["set-data"] = requestHandler.SetData
 
 	return r.GetHandler()
 }

@@ -50,7 +50,7 @@ func NewUser() *User {
 		Email:      "wendibender@bolax.com",
 		Phone:      "+1 (917) 493-2106",
 		Address:    "450 Ross Street, Vale, Washington, 6693",
-		About:      "Lorem et commodo ipsum nisi pariatur proident dolore sint cupidatat pariatur. Nostrud id enim tempor incididunt ad id non proident exercitation do exercitation exercitation adipisicing. Adipisicing fugiat commodo fugiat pariatur fugiat. Lorem occaecat quis officia eiusmod labore cillum dolore esse. Elit proident nisi ad consequat nulla commodo ullamco est ullamco cupidatat. Incididunt ex in ipsum sit.\r\n",
+		About:      "Lorem et commodo ipsum nisi pariatur proident dolore sint cupidatat pariatur. Nostrud id enim tempor incididunt ad id non proident exercitation do exercitation exercitation adipisicing. Adipisicing fugiat commodo fugiat pariatur fugiat. Lorem occaecat quis officia eiusmod labore cillum dolore esse. Elit proident nisi ad consequat nulla commodo ullamco est ullamco cupidatat. Incididunt ex in ipsum sit.",
 		Registered: "2018-06-29T07:57:03 -07:00",
 		Latitude:   -87.616308,
 		Longitude:  121.133756,

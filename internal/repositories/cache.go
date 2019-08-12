@@ -4,12 +4,9 @@ import (
 	"encoding/json"
 
 	"github.com/cikupin/redis-mutex-lock/drivers"
+	"github.com/cikupin/redis-mutex-lock/internal/constants"
 	"github.com/cikupin/redis-mutex-lock/internal/models"
 	"github.com/gomodule/redigo/redis"
-)
-
-const (
-	userCacheKey = "dummy_user"
 )
 
 // ICache defines interface for cache
@@ -56,5 +53,17 @@ func (c *CacheRepo) GetCache(key string) (models.User, error) {
 
 // UpdateCache will update cache value
 func (c *CacheRepo) UpdateCache(key string) error {
+	conn := c.redisDriver.GetConn()
+	defer conn.Close()
+
+	jsonStr, err := json.Marshal(c.user)
+	if err != nil {
+		return err
+	}
+
+	_, err = redis.String(conn.Do("SETEX", key, constants.UserCacheTTL, jsonStr))
+	if err != nil {
+		return err
+	}
 	return nil
 }

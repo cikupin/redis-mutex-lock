@@ -23,6 +23,8 @@ func NewRestAPIRouter(c map[string]http.HandlerFunc) *RestAPIRouter {
 func (r *RestAPIRouter) GetHandler() (http.Handler, error) {
 	muxRouter := mux.NewRouter()
 	muxRouter.HandleFunc("/", r.Handlers["ok"]).Methods(http.MethodGet)
+	muxRouter.HandleFunc("/get-data", r.Handlers["get-data"]).Methods(http.MethodGet)
+	muxRouter.HandleFunc("/set-data", r.Handlers["set-data"]).Methods(http.MethodGet)
 
 	return muxRouter, nil
 }
