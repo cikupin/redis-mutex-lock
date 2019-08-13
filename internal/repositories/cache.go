@@ -99,7 +99,7 @@ func (c *CacheRepo) GetCacheWithThunderingHerd(key string) (models.User, error) 
 		log.Println("<<<<<<<<<< [ THUNDERING HERD ] LOCKING >>>>>>>>>>>>")
 
 		log.Println("<<<<<<<<<< [ THUNDERING HERD ] UPDATING DATA >>>>>>>>>>>>")
-		time.Sleep(15 * time.Second)
+		time.Sleep(constants.RedisLockerExpiry)
 		_ = c.UpdateCache(key)
 
 		mtx.Unlock()
