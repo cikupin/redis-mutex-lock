@@ -16,7 +16,6 @@ import (
 type ICache interface {
 	GetCache(key string) (models.User, error)
 	UpdateCache(key string) error
-	GetLocker(lockerKey string) *redsync.Mutex
 	GetCacheWithThunderingHerd(key string) (models.User, error)
 }
 
