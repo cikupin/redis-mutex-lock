@@ -17,14 +17,6 @@ const (
 	redisPassword  = ""
 )
 
-// RedisOption defines redis options struct
-type RedisOption struct {
-	Host      string
-	Port      int
-	Password  string
-	Namespace string
-}
-
 // RedisPool defines redis pooling
 type RedisPool struct {
 	pool *redis.Pool
