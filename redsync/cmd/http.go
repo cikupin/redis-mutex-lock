@@ -9,7 +9,7 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/cikupin/redis-mutex-lock/routes"
+	"github.com/cikupin/redis-mutex-lock/redsync/routes"
 )
 
 // Exec executes apps

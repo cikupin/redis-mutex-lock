@@ -5,9 +5,9 @@ import (
 	"log"
 	"time"
 
-	"github.com/cikupin/redis-mutex-lock/drivers"
-	"github.com/cikupin/redis-mutex-lock/internal/constants"
-	"github.com/cikupin/redis-mutex-lock/internal/models"
+	"github.com/cikupin/redis-mutex-lock/redsync/drivers"
+	"github.com/cikupin/redis-mutex-lock/redsync/internal/constants"
+	"github.com/cikupin/redis-mutex-lock/redsync/internal/models"
 	"github.com/go-redsync/redsync"
 	"github.com/gomodule/redigo/redis"
 )

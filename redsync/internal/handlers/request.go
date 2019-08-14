@@ -4,9 +4,9 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/cikupin/redis-mutex-lock/internal/api"
-	"github.com/cikupin/redis-mutex-lock/internal/constants"
-	"github.com/cikupin/redis-mutex-lock/internal/repositories"
+	"github.com/cikupin/redis-mutex-lock/redsync/internal/api"
+	"github.com/cikupin/redis-mutex-lock/redsync/internal/constants"
+	"github.com/cikupin/redis-mutex-lock/redsync/internal/repositories"
 )
 
 type (

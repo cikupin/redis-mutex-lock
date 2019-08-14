@@ -5,9 +5,9 @@ import (
 	"net/http"
 	"sync"
 
-	"github.com/cikupin/redis-mutex-lock/drivers"
-	"github.com/cikupin/redis-mutex-lock/internal/handlers"
-	"github.com/cikupin/redis-mutex-lock/internal/repositories"
+	"github.com/cikupin/redis-mutex-lock/redsync/drivers"
+	"github.com/cikupin/redis-mutex-lock/redsync/internal/handlers"
+	"github.com/cikupin/redis-mutex-lock/redsync/internal/repositories"
 )
 
 // RestAPI is a type of struct that contain rest API handler
