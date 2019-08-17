@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"time"
 
@@ -83,26 +84,31 @@ func (c *CacheRepo) GetCacheWithThunderingHerd(key string) (models.User, error) 
 	conn = c.redisDriver.GetConn()
 	defer conn.Close()
 
+	lockKey := fmt.Sprintf("lock-key-%s", key)
+	mtx := c.redisDriver.GetPoolLocker().NewMutex(
+		lockKey,
+		redsync.SetTries(constants.RedisLockerTries),
+		redsync.SetExpiry(constants.RedisLockerExpiry),
+	)
+
+	for {
+		err := mtx.Lock()
+		if err == nil {
+			break
+		}
+	}
+	defer mtx.Unlock()
+
 	userCache, err := redis.String(conn.Do("GET", key))
 	if err != nil && err != redis.ErrNil {
 		return user, err
 	}
 
 	if err == redis.ErrNil {
-		mtx := c.redisDriver.GetPoolLocker().NewMutex(
-			key,
-			redsync.SetTries(constants.RedisLockerTries),
-			redsync.SetExpiry(constants.RedisLockerExpiry),
-		)
-		mtx.Lock()
-		log.Println("<<<<<<<<<< [ THUNDERING HERD ] LOCKING >>>>>>>>>>>>")
-
 		log.Println("<<<<<<<<<< [ THUNDERING HERD ] UPDATING DATA >>>>>>>>>>>>")
 		time.Sleep(constants.RedisLockerExpiry)
 		_ = c.UpdateCache(key)
-
-		mtx.Unlock()
-		log.Println("<<<<<<<<<< [ THUNDERING HERD ] UNLOCKING >>>>>>>>>>>>")
+		log.Println("<<<<<<<<<< [ THUNDERING HERD ] FINISHED UPDATING DATA >>>>>>>>>>>>")
 
 		userCache, _ = redis.String(conn.Do("GET", key))
 	}

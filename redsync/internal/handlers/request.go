@@ -45,7 +45,8 @@ func (r *RequestHandler) GetData(wr http.ResponseWriter, req *http.Request) {
 
 	data, err := r.cacheRepo.GetCache(constants.UserCacheKey)
 	if err != nil {
-		panic(err)
+		log.Println(err)
+		return
 	}
 
 	resp := api.GeneralSuccess
@@ -61,7 +62,8 @@ func (r *RequestHandler) SetData(wr http.ResponseWriter, req *http.Request) {
 
 	err := r.cacheRepo.UpdateCache(constants.UserCacheKey)
 	if err != nil {
-		panic(err)
+		log.Println(err)
+		return
 	}
 
 	resp := api.GeneralSuccess
@@ -77,7 +79,8 @@ func (r *RequestHandler) GetDataWithThunderingHerdUpdate(wr http.ResponseWriter,
 
 	data, err := r.cacheRepo.GetCacheWithThunderingHerd(constants.UserCacheKey)
 	if err != nil {
-		panic(err)
+		log.Println(err)
+		return
 	}
 
 	resp := api.GeneralSuccess
