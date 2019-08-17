@@ -1,0 +1,16 @@
+[prune]
+  go-tests = true
+  unused-packages = true
+
+[[constraint]]
+  name = "github.com/gorilla/mux"
+  version = "1.7.2"
+  
+
+[[constraint]]
+  name = "github.com/go-redis/redis"
+  version = "6.15.4"
+
+[[constraint]]
+  name = "github.com/bsm/redislock"
+  version = "0.3.0"
