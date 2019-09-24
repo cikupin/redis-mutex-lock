@@ -78,26 +78,34 @@ func (c *CacheRepo) GetCacheWithThunderingHerd(key string) (models.User, error) 
 		RetryCount: constants.RedisLockerTries,
 	}
 
-	for {
-		locker, err = c.redisDriver.GetPoolLocker().Obtain(lockKey, constants.RedisLockerExpiry, opts)
-		if err == nil {
-			break
-		}
-	}
-	defer locker.Release()
-
 	userCache, err := c.redisClient.Get(key).Result()
 	if err != nil && err != redis.Nil {
 		return user, err
 	}
 
 	if err == redis.Nil {
-		log.Println("<<<<<<<<<< [ THUNDERING HERD ] UPDATING DATA >>>>>>>>>>>>")
-		time.Sleep(constants.RedisLockerExpiry)
-		_ = c.UpdateCache(key)
-		log.Println("<<<<<<<<<< [ THUNDERING HERD ] FINISHED UPDATING DATA >>>>>>>>>>>>")
 
-		userCache, _ = c.redisClient.Get(key).Result()
+		for {
+			locker, err = c.redisDriver.GetPoolLocker().Obtain(lockKey, constants.RedisLockerExpiry, opts)
+			if err == nil {
+				break
+			}
+		}
+		defer locker.Release()
+
+		userCache, err := c.redisClient.Get(key).Result()
+		if err != nil && err != redis.Nil {
+			return user, err
+		}
+
+		if err == redis.Nil {
+			log.Println("<<<<<<<<<< [ THUNDERING HERD ] UPDATING DATA >>>>>>>>>>>>")
+			time.Sleep(constants.RedisLockerExpiry)
+			_ = c.UpdateCache(key)
+			log.Println("<<<<<<<<<< [ THUNDERING HERD ] FINISHED UPDATING DATA >>>>>>>>>>>>")
+
+			userCache, _ = c.redisClient.Get(key).Result()
+		}
 	}
 
 	err = json.Unmarshal([]byte(userCache), &user)

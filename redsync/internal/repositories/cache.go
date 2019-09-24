@@ -91,26 +91,33 @@ func (c *CacheRepo) GetCacheWithThunderingHerd(key string) (models.User, error) 
 		redsync.SetExpiry(constants.RedisLockerExpiry),
 	)
 
-	for {
-		err := mtx.Lock()
-		if err == nil {
-			break
-		}
-	}
-	defer mtx.Unlock()
-
 	userCache, err := redis.String(conn.Do("GET", key))
 	if err != nil && err != redis.ErrNil {
 		return user, err
 	}
 
 	if err == redis.ErrNil {
-		log.Println("<<<<<<<<<< [ THUNDERING HERD ] UPDATING DATA >>>>>>>>>>>>")
-		time.Sleep(constants.RedisLockerExpiry)
-		_ = c.UpdateCache(key)
-		log.Println("<<<<<<<<<< [ THUNDERING HERD ] FINISHED UPDATING DATA >>>>>>>>>>>>")
+		for {
+			err := mtx.Lock()
+			if err == nil {
+				break
+			}
+		}
+		defer mtx.Unlock()
 
-		userCache, _ = redis.String(conn.Do("GET", key))
+		userCache, err = redis.String(conn.Do("GET", key))
+		if err != nil && err != redis.ErrNil {
+			return user, err
+		}
+
+		if err == redis.ErrNil {
+			log.Println("<<<<<<<<<< [ THUNDERING HERD ] UPDATING DATA >>>>>>>>>>>>")
+			time.Sleep(constants.RedisLockerExpiry)
+			_ = c.UpdateCache(key)
+			log.Println("<<<<<<<<<< [ THUNDERING HERD ] FINISHED UPDATING DATA >>>>>>>>>>>>")
+
+			userCache, _ = redis.String(conn.Do("GET", key))
+		}
 	}
 
 	err = json.Unmarshal([]byte(userCache), &user)
